@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 LABEL maintainer="Brooks Prumo <brooks@prumo.org>"
 
 RUN ln -sf /usr/share/zoneinfo/UTC /etc/localtime
@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	apt-utils \
 	ca-certificates \
 	ccache \
+	cmake \
 	device-tree-compiler \
 	dfu-util \
 	file \
@@ -29,11 +30,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 	wget \
 	xz-utils
 
-RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null \
-	&& apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main' \
-	&& apt-get update \
-	&& apt-get install -y --no-install-recommends cmake
-
 RUN pip3 install -U west
 ENV PATH=/usr/local/bin:$PATH
 RUN west init /zephyrproject \
@@ -41,10 +37,9 @@ RUN west init /zephyrproject \
 	&& west update \
 	&& west zephyr-export \
 	&& pip3 install -r zephyr/scripts/requirements.txt
-RUN wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.11.3/zephyr-sdk-0.11.3-setup.run \
-	&& chmod +x zephyr-sdk-0.11.3-setup.run \
-	&& /zephyr-sdk-0.11.3-setup.run -- -d /zephyr-sdk-0.11.3 \
-	&& rm -f /zephyr-sdk-0.11.3-setup.run
-ENV PATH=/zephyr-sdk-0.11.3/sysroots/x86_64-pokysdk-linux/usr/bin:$PATH
+RUN wget --quiet https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.11.4/zephyr-sdk-0.11.4-setup.run
+RUN chmod +x zephyr-sdk-0.11.4-setup.run \
+	&& /zephyr-sdk-0.11.4-setup.run --quiet -- -d /opt/zephyr-sdk-0.11.4 \
+	&& rm -f /zephyr-sdk-0.11.4-setup.run
 
 WORKDIR /zephyrproject

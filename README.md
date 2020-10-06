@@ -20,5 +20,5 @@ then
 
 ```
 cd /zephyrproject/zephyr
-west build -p auto -b nrf52840_pca10056 samples/basic/blinky
+west build -p auto --board nrf52840dk_nrf52840 samples/basic/blinky
 ```
